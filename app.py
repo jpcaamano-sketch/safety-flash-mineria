@@ -23,18 +23,18 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    #MainMenu { visibility: hidden; }
+    footer    { visibility: hidden; }
+
     .main-header {
         text-align: center;
-        padding: 1rem 0;
+        padding: 0.8rem 0;
         border-bottom: 2px solid #e0e0e0;
         margin-bottom: 1rem;
     }
-    .step-indicator {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin: 1rem 0;
-    }
+    .main-header h1 { font-size: clamp(1.4rem, 5vw, 2rem); margin: 0; }
+    .main-header p  { font-size: clamp(0.8rem, 3vw, 1rem); margin: 0; }
+
     .risk-badge {
         display: inline-block;
         padding: 5px 15px;
@@ -44,6 +44,9 @@ st.markdown("""
     }
     .stButton>button {
         width: 100%;
+        min-height: 52px;
+        font-size: clamp(0.9rem, 3vw, 1rem);
+        border-radius: 10px;
     }
     .worker-card {
         background: #f8f9fa;
@@ -57,6 +60,16 @@ st.markdown("""
         padding: 10px 15px;
         border-radius: 8px;
         margin: 10px 0;
+    }
+    /* Inputs más grandes en móvil */
+    .stTextInput input {
+        font-size: clamp(1rem, 4vw, 1.2rem) !important;
+        padding: 10px !important;
+    }
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 750px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -216,27 +229,25 @@ def render_step_3_audio():
     """Step 3: Audio recording and description"""
     st.markdown("### 🎤 Describe lo que Viste")
 
-    # Info y foto
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        if st.session_state.photo:
-            st.image(st.session_state.photo, caption="Foto capturada", use_container_width=True)
-    with col2:
+    # Info del trabajador
+    if st.session_state.worker:
         st.markdown(f"""
         <div class="info-box">
-            👤 <b>{st.session_state.worker['name']}</b><br>
+            👤 <b>{st.session_state.worker['name']}</b> |
             📍 {st.session_state.location.get('name', 'N/A')}
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("""
-        **Describe con tus propias palabras:**
-        - ¿Qué viste?
-        - ¿Dónde exactamente?
-        - ¿Hay riesgo inmediato?
+    # Foto capturada (compacta, no ocupa toda la pantalla)
+    if st.session_state.photo:
+        st.image(st.session_state.photo, caption="Foto capturada", width=250)
 
-        *Habla naturalmente, como le contarías a un compañero.*
-        """)
+    st.markdown("""
+    **Describe con tus propias palabras:**
+    - ¿Qué viste?  ¿Dónde exactamente?  ¿Hay riesgo inmediato?
+
+    *Habla naturalmente, como le contarías a un compañero.*
+    """)
 
     st.markdown("---")
 
@@ -379,16 +390,11 @@ def render_step_4_success():
     ---
     """)
 
-    # Show report details
-    col1, col2 = st.columns(2)
+    st.markdown("**📝 Tu descripción original:**")
+    st.info(report.get('transcripcion_audio', 'N/A'))
 
-    with col1:
-        st.markdown("**📝 Tu descripción original:**")
-        st.info(report.get('transcripcion_audio', 'N/A'))
-
-    with col2:
-        st.markdown("**🤖 Análisis técnico (IA):**")
-        st.write(report.get('descripcion_tecnica', 'N/A'))
+    st.markdown("**🤖 Análisis técnico (IA):**")
+    st.write(report.get('descripcion_tecnica', 'N/A'))
 
     st.markdown("---")
 
